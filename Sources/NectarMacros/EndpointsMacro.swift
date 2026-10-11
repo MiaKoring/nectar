@@ -49,12 +49,21 @@ extension EndpointsMacro: MemberMacro {
     }
 }
 
-extension EndpointsMacro: PeerMacro {
-    public static func expansion(
-        of node: SwiftSyntax.AttributeSyntax,
-        providingPeersOf declaration: some SwiftSyntax.DeclSyntaxProtocol,
-        in context: some SwiftSyntaxMacros.MacroExpansionContext
-    ) throws -> [SwiftSyntax.DeclSyntax] {
-        []
+extension EndpointsMacro: ExtensionMacro {
+    public static func expansion(of node: SwiftSyntax.AttributeSyntax, attachedTo declaration: some SwiftSyntax.DeclGroupSyntax, providingExtensionsOf type: some SwiftSyntax.TypeSyntaxProtocol, conformingTo protocols: [SwiftSyntax.TypeSyntax], in context: some SwiftSyntaxMacros.MacroExpansionContext) throws -> [SwiftSyntax.ExtensionDeclSyntax] {
+        guard let structNode = StructDeclSyntax(declaration) else {
+            return []
+        }
+        
+        let memberBlock = MemberBlockSyntax {
+            for decl in structNode.helperFunctions(context: context) {
+                MemberBlockItemSyntax(decl: decl)
+            }
+        }
+        
+        return [ExtensionDeclSyntax(
+            extendedType: IdentifierTypeSyntax(name: .identifier(structNode.name.text)),
+            memberBlock: memberBlock
+        ).formatted().as(ExtensionDeclSyntax.self)!]
     }
 }

@@ -2,15 +2,12 @@ import SwiftSyntax
 import SwiftSyntaxMacros
 import SwiftSyntaxMacroExpansion
 import SwiftDiagnostics
+import SwiftBasicFormat
 
 extension StructDeclSyntax {
-    func endpoints(context: some MacroExpansionContext) -> [ExprSyntax] {
-        var logger = StandardError()
-        
+    func endpoints(context _: some MacroExpansionContext) -> [ExprSyntax] {
         let functions = memberBlock.members
             .compactMap { $0.decl.as(FunctionDeclSyntax.self) }
-        
-        context.diagnose(.init(node: self, message: Message(message: "functions: \(functions.filter{ $0.httpMethod != nil }.count)", id: "lol", severity: .warning)))
         
         var endpoints = [ExprSyntax]()
         
@@ -19,8 +16,8 @@ extension StructDeclSyntax {
             
             let arguments = function.arguments
             
-            let pathParameters = arguments.filter { (name, _) in
-                name != "body" && !method.queryParams.contains(name)
+            let pathParameters = arguments.filter { (name, type) in
+                name != "body" && type.typeAllowsPathParameter
             }.map { ":\($0.0)" }
             
             let partialPath = method.pattern
@@ -43,9 +40,91 @@ extension StructDeclSyntax {
         
         return endpoints
     }
+    
+    func helperFunctions(context: some MacroExpansionContext) -> [DeclSyntax] {
+        return memberBlock.members
+            .compactMap {
+                guard let function = $0.decl.as(FunctionDeclSyntax.self) else { return nil }
+                return function.correspondingHelper(context: context)
+            }
+    }
 }
 
 extension FunctionDeclSyntax {
+    func correspondingHelper(context: some MacroExpansionContext) -> DeclSyntax? {
+        guard let method = httpMethod else { return nil }
+        
+        let pathParameters = arguments.filter { (name, type) in
+            name != "body" && type.typeAllowsPathParameter
+        }
+        
+        let body = arguments.first(where: { $0.0 == "body" })
+        
+        let queryParams = arguments.filter { (name, type) in
+            name != "body" && type.typeAllowsQueryParameter
+        }
+        
+        let bodyString: String
+        
+        if let body {
+            bodyString = #"""
+            let body = try await request.decode(
+                    as: \#(body.1).self,
+                    context: context
+                )
+            """# + "\n"
+        } else { bodyString = ""}
+        
+        var queryParamsString = queryParams.map { (name, type) in
+            return #"""
+            let _\#(name) = request.uri.queryParameters["\#(name)"]
+            let \#(name) = \#(type)(fromString: _\#(name))
+            """#
+        }.joined(separator: "\n")
+        
+        if !queryParamsString.isEmpty {
+            queryParamsString += "\n"
+        }
+        
+        var pathParamsString = pathParameters.map { (name, type) in
+            return #"""
+            let _\#(name) = try context.parameters.require("\#(name)")
+            guard let \#(name) = \#(type)(fromString: _\#(name)) else {
+                throw ParameterConversionError.failedConversionFromString(name: "\#(name)")
+            }
+            """#
+        }.joined(separator: "\n")
+        
+        if !pathParamsString.isEmpty {
+            pathParamsString += "\n"
+        }
+        
+        let functionParameters = arguments.map { (name, type) in
+            if type.isContext {
+                "\(name): context"
+            } else if type.isRequest {
+                "\(name): request"
+            } else {
+                "\(name): \(name)"
+            }
+        }.joined(separator: ",\n")
+        
+        let awaitClause = signature.effectSpecifiers?.asyncSpecifier != nil ? "await " : ""
+        let tryClause = signature.effectSpecifiers?.throwsClause?.throwsSpecifier != nil ? "try " : ""
+        
+        return #"""
+        func _\#(raw: name.text)(
+            _ request: Request,
+            _ context: any RequestContext
+        ) async throws -> Response {
+            \#(raw: bodyString)\#(raw: queryParamsString)\#(raw: pathParamsString)
+            return \#(raw: tryClause)\#(raw: awaitClause)\#(raw: name.text)(
+                \#(raw: functionParameters)
+            ).response(from: request, context: context)
+        }
+        """#
+    }
+    
     private var methods: [String] {
         ["GET", "SET", "POST", "PATCH"]
     }
@@ -112,7 +191,6 @@ extension ExprSyntax {
 
 struct HTTPMethod: Hashable {
     let pattern: String?
-    let queryParams: [String]
     let method: `Type`
     
     init?(_ node: AttributeSyntax) {
@@ -125,13 +203,11 @@ struct HTTPMethod: Hashable {
         guard let args = node.arguments?.as(LabeledExprListSyntax.self)
         else {
             self.pattern = nil
-            self.queryParams = []
             return
         }
         
         guard !args.contains(where: {
             $0.label?.text != "pattern"
-            && $0.label?.text != "queryParams"
         }) else {
             return nil
         }
@@ -143,15 +219,6 @@ struct HTTPMethod: Hashable {
             self.pattern = patternString
         } else {
             self.pattern = nil
-        }
-        
-        if
-            let queryParams = args.first(where: { $0.label?.text == "queryParams"}),
-            let params = queryParams.expression.asStringArray
-        {
-            self.queryParams = params
-        } else {
-            self.queryParams = []
         }
     }
     
@@ -170,5 +237,25 @@ struct HTTPMethod: Hashable {
         var asEnumString: String {
             rawValue.lowercased()
         }
+    }
+}
+
+extension String {
+    var typeAllowsPathParameter: Bool {
+        self.last != "?" && !self.hasPrefix("Optional<")
+        && self != "Request" && self != "any RequestContext"
+    }
+    
+    var typeAllowsQueryParameter: Bool {
+        self.last == "?" || self.hasPrefix("Optional<")
+        && self != "Request" && self != "any RequestContext"
+    }
+    
+    var isRequest: Bool {
+        self == "Request"
+    }
+    
+    var isContext: Bool {
+        self == "any RequestContext"
     }
 }
