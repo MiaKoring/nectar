@@ -10,6 +10,66 @@ extension UUID: StringConvertible {
     }
 }
 
+extension Int: StringConvertible {
+    public init?(fromString string: String) {
+        self.init(string)
+    }
+}
+
+extension Int8: StringConvertible {
+    public init?(fromString string: String) {
+        self.init(string)
+    }
+}
+
+extension Int16: StringConvertible {
+    public init?(fromString string: String) {
+        self.init(string)
+    }
+}
+
+extension Int32: StringConvertible {
+    public init?(fromString string: String) {
+        self.init(string)
+    }
+}
+
+extension Int64: StringConvertible {
+    public init?(fromString string: String) {
+        self.init(string)
+    }
+}
+
+extension UInt8: StringConvertible {
+    public init?(fromString string: String) {
+        self.init(string)
+    }
+}
+
+extension UInt16: StringConvertible {
+    public init?(fromString string: String) {
+        self.init(string)
+    }
+}
+
+extension UInt32: StringConvertible {
+    public init?(fromString string: String) {
+        self.init(string)
+    }
+}
+
+extension UInt64: StringConvertible {
+    public init?(fromString string: String) {
+        self.init(string)
+    }
+}
+
+extension Bool: StringConvertible {
+    public init?(fromString string: String) {
+        self.init(string)
+    }
+}
+
 extension Optional: StringConvertible where Wrapped: StringConvertible {
     public init(fromString string: String) {
         self = Wrapped(fromString: string)
