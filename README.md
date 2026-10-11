@@ -2,7 +2,7 @@
 Nectar is a thin, type-safe, declarative router layer built on top of the Hummingbird server framework. It brings high-ergonomics, controller-style endpoint definitions to server-side Swift without sacrificing performance.
 
 > [!IMPORTANT]
-> Nectar is currently a Proof of Concept (PoC). If there is enough interest and community feedback, it will be expanded into a fully tested, public library!
+> Nectar is currently a Proof of Concept (PoC). If there is enough interest and community feedback, it will be expanded into a fully tested, public library.
 
 ```swift  
 import Nectar
