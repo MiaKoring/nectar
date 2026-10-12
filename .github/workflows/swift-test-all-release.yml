@@ -1,0 +1,28 @@
+name: Swift Test release
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  macos:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd #6.0.2
+        with:
+          persist-credentials: false
+      - name: Test
+        run: ./Scripts/test-release.sh
+  linux:
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    container:
+      image: swift:6.3.2-noble
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd #6.0.2
+        with:
+          persist-credentials: false
+      - name: Test
+        run: ./Scripts/test-release.sh
