@@ -18,4 +18,4 @@ jobs:
         with:
           persist-credentials: false
       - name: Run tests
-        run: ./Scripts/test.sh
+        run: swift test -Xswiftc -Xfrontend -Xswiftc -enable-cross-import-overlays -Xswiftc -target -Xswiftc arm64-apple-macosx15.0
