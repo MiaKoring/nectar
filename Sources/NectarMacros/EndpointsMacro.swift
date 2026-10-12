@@ -1,3 +1,13 @@
+// ===----------------------------------------------------------------------===
+//
+// This source file is part of the Nectar open source project
+//
+// Copyright (c) 2026 Mia Koring.
+//
+// Licensed under Apache License v2.0
+//
+// ===----------------------------------------------------------------------===
+
 import SwiftSyntax
 import SwiftSyntaxMacros
 import SwiftSyntaxMacroExpansion
@@ -21,46 +31,53 @@ extension EndpointsMacro: MemberMacro {
                     severity: .error
                 )
             ))
-            
+
             return []
         }
-        
+
         let endpointExprs: [ExprSyntax] = structNode.endpoints(context: context)
         let arrayElementList = ArrayElementListSyntax(
             endpointExprs.enumerated().map { index, expr in
                 ArrayElementSyntax(
                     expression: expr,
-                    trailingComma: index == endpointExprs.count - 1 ? nil : .commaToken(trailingTrivia: .newline)
+                    trailingComma: index == endpointExprs
+                        .count - 1 ? nil : .commaToken(trailingTrivia: .newline)
                 )
             }
         )
-        
+
         let code: DeclSyntax = #"""
-        var _endpoints: [Endpoint] {
-            [
-                \#(arrayElementList)
-            ]
-        }
-        """#
-        
+            var _endpoints: [Endpoint] {
+                [
+                    \#(arrayElementList)
+                ]
+            }
+            """#
+
         let formatted = code.formatted()
-        
+
         return [formatted.as(DeclSyntax.self)!]
     }
 }
 
 extension EndpointsMacro: ExtensionMacro {
-    public static func expansion(of node: SwiftSyntax.AttributeSyntax, attachedTo declaration: some SwiftSyntax.DeclGroupSyntax, providingExtensionsOf type: some SwiftSyntax.TypeSyntaxProtocol, conformingTo protocols: [SwiftSyntax.TypeSyntax], in context: some SwiftSyntaxMacros.MacroExpansionContext) throws -> [SwiftSyntax.ExtensionDeclSyntax] {
+    public static func expansion(
+        of node: SwiftSyntax.AttributeSyntax,
+        attachedTo declaration: some SwiftSyntax.DeclGroupSyntax,
+        providingExtensionsOf type: some SwiftSyntax.TypeSyntaxProtocol,
+        conformingTo protocols: [SwiftSyntax.TypeSyntax],
+        in context: some SwiftSyntaxMacros.MacroExpansionContext
+    ) throws -> [SwiftSyntax.ExtensionDeclSyntax] {
         guard let structNode = StructDeclSyntax(declaration) else {
             return []
         }
-        
+
         let memberBlock = MemberBlockSyntax {
             for decl in structNode.helperFunctions(context: context) {
                 MemberBlockItemSyntax(decl: decl)
             }
         }
-        
+
         return [ExtensionDeclSyntax(
             extendedType: IdentifierTypeSyntax(name: .identifier(structNode.name.text)),
             memberBlock: memberBlock

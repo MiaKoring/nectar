@@ -1,10 +1,24 @@
+// ===----------------------------------------------------------------------===
+//
+// This source file is part of the Nectar open source project
+//
+// Copyright (c) 2026 Mia Koring.
+//
+// Licensed under Apache License v2.0
+//
+// ===----------------------------------------------------------------------===
+
 import Testing
 @testable import Nectar
 import MacroTesting
 import NectarMacros
 
 @Suite(.macros([
-    EndpointsMacro.self, GetMacro.self, PostMacro.self, PatchMacro.self, DeleteMacro.self
+    EndpointsMacro.self,
+    GetMacro.self,
+    PostMacro.self,
+    PatchMacro.self,
+    DeleteMacro.self
 ]))
 struct MacroTests {
     @Test func `basic expansion`() async throws {
@@ -13,18 +27,18 @@ struct MacroTests {
             @Endpoints
             struct BasicEndpoints: EndpointGroup {
                 let partialName = "basic"
-            
+
                 var subgroups: [Endpoint] { }
-            
+
                 @GET
                 func get() -> String { "" }
-            
+
                 @POST
                 func post() -> String { "" }
-            
+
                 @PATCH
                 func patch() -> String { "" }
-            
+
                 @DELETE
                 func delete() -> String { "" }
             }
@@ -123,25 +137,25 @@ struct MacroTests {
             """
         }
     }
-    
+
     @Test func `respects async throws`() async throws {
         assertMacro {
             """
             @Endpoints
             struct BasicEndpoints: EndpointGroup {
                 let partialName = "basic"
-            
+
                 var subgroups: [Endpoint] { }
-            
+
                 @GET
                 func get() -> String { "" }
-            
+
                 @POST
                 func post() async -> String { "" }
-            
+
                 @PATCH
                 func patch() throws -> String { "" }
-            
+
                 @DELETE
                 func delete() async throws -> String { "" }
             }
@@ -240,34 +254,34 @@ struct MacroTests {
             """
         }
     }
-    
+
     @Test func `parses function parameters correctly`() async throws {
         assertMacro {
             """
             @Endpoints
             struct BasicEndpoints: EndpointGroup {
                 let partialName = "basic"
-            
+
                 var subgroups: [Endpoint] { }
-            
+
                 @GET
                 func get(number: Int) -> String { "" }
-            
+
                 @POST
                 func post(number: Int?) -> String { "" }
-            
+
                 @PATCH
                 func patch(number: Optional<Int>) -> String { "" }
-            
+
                 @DELETE
                 func delete(body: String) -> String { "" }
-            
+
                 @DELETE
                 func deleteReq(req: Request) -> String { "" }
-            
+
                 @DELETE
                 func deleteContext(context: any RequestContext) -> String { "" }
-            
+
                 @DELETE
                 func deleteEverything(
                     number: Int,
@@ -466,34 +480,34 @@ struct MacroTests {
             """
         }
     }
-    
+
     @Test func `respects pattern`() async throws {
         assertMacro {
             """
             @Endpoints
             struct BasicEndpoints: EndpointGroup {
                 let partialName = "basic"
-            
+
                 var subgroups: [Endpoint] { }
-            
+
                 @GET(pattern: ":number/activity")
                 func get(number: Int) -> String { "" }
-            
+
                 @POST(pattern: "integer1")
                 func post(number: Int?) -> String { "" }
-            
+
                 @PATCH(pattern: "integer2")
                 func patch(number: Optional<Int>) -> String { "" }
-            
+
                 @DELETE(pattern: "body")
                 func delete(body: String) -> String { "" }
-            
+
                 @DELETE(pattern: "request")
                 func deleteReq(req: Request) -> String { "" }
-            
+
                 @DELETE(pattern: "context")
                 func deleteContext(context: any RequestContext) -> String { "" }
-            
+
                 @DELETE(pattern: ":number/activity")
                 func deleteEverything(
                     number: Int,
@@ -692,16 +706,16 @@ struct MacroTests {
             """
         }
     }
-    
+
     @Test func `warns for unused parameters`() async throws {
         assertMacro {
             """
             @Endpoints
             struct BasicEndpoints: EndpointGroup {
                 let partialName = "basic"
-            
+
                 var subgroups: [Endpoint] { }
-            
+
                 @GET(pattern: ":number/activity")
                 func get() -> String { "" }
             }
@@ -757,16 +771,16 @@ struct MacroTests {
             """
         }
     }
-    
+
     @Test func `fails for illegal parameter`() async throws {
         assertMacro {
             """
             @Endpoints
             struct BasicEndpoints: EndpointGroup {
                 let partialName = "basic"
-            
+
                 var subgroups: [Endpoint] { }
-            
+
                 @GET(pattern: ":req/:con/:body/:test")
                 func get(req: Request, con: any RequestContext) -> String { "" }
             }
@@ -790,16 +804,16 @@ struct MacroTests {
             """
         }
     }
-    
+
     @Test func `reports path parameter declared as url parameter`() async throws {
         assertMacro {
             """
             @Endpoints
             struct BasicEndpoints: EndpointGroup {
                 let partialName = "basic"
-            
+
                 var subgroups: [Endpoint] { }
-            
+
                 @GET(pattern: ":number/activity")
                 func get(number: Int?) -> String { "" }
             }

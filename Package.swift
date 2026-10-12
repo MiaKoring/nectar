@@ -18,6 +18,11 @@ let package = Package(
         .package(url: "https://github.com/hummingbird-project/hummingbird.git", from: "2.25.0"),
         .package(url: "https://github.com/swiftlang/swift-syntax.git", "600.0.0" ..< "605.0.0"),
         .package(url: "https://github.com/pointfreeco/swift-macro-testing.git", from: "0.7.0"),
+        .package(
+            url: "https://github.com/apple/swift-configuration.git",
+            from: "1.0.2",
+            traits: []
+        ),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -45,7 +50,10 @@ let package = Package(
             dependencies: [
                 "Nectar",
                 "NectarMacros",
+                .product(name: "Hummingbird", package: "hummingbird"),
+                .product(name: "HummingbirdTesting", package: "hummingbird"),
                 .product(name: "MacroTesting", package: "swift-macro-testing"),
+                .product(name: "Configuration", package: "swift-configuration"),
             ],
             swiftSettings: [
                 .enableUpcomingFeature("ApproachableConcurrency"),

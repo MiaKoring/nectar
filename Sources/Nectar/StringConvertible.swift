@@ -1,3 +1,13 @@
+// ===----------------------------------------------------------------------===
+//
+// This source file is part of the Nectar open source project
+//
+// Copyright (c) 2026 Mia Koring.
+//
+// Licensed under Apache License v2.0
+//
+// ===----------------------------------------------------------------------===
+
 import Foundation
 
 public protocol StringConvertible {
@@ -74,7 +84,7 @@ extension Optional: StringConvertible where Wrapped: StringConvertible {
     public init(fromString string: String) {
         self = Wrapped(fromString: string)
     }
-    
+
     public init(fromString string: String?) {
         guard let string else {
             self = nil
@@ -82,7 +92,7 @@ extension Optional: StringConvertible where Wrapped: StringConvertible {
         }
         self = Wrapped(fromString: string)
     }
-    
+
     public init(fromString substr: Substring?) {
         guard let substr else {
             self = nil
