@@ -14,7 +14,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Test
-        run: swift test -Xswiftc -Xfrontend -Xswiftc -enable-cross-import-overlays -Xswiftc -target -Xswiftc arm64-apple-macosx15.0 -c release
+        run: swift test -c release
   linux:
     runs-on: blacksmith-4vcpu-ubuntu-2404
     container:
@@ -25,4 +25,4 @@ jobs:
         with:
           persist-credentials: false
       - name: Test
-        run: ./Scripts/test-release.sh
+        run: swift test -c release
