@@ -23,6 +23,7 @@ let package = Package(
             from: "1.0.2",
             traits: []
         ),
+        .package(url: "https://github.com/apple/swift-service-context.git", from: "1.0.0"),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -31,6 +32,7 @@ let package = Package(
             name: "Nectar",
             dependencies: [
                 .product(name: "Hummingbird", package: "hummingbird"),
+                .product(name: "ServiceContextModule", package: "swift-service-context"),
                 "NectarMacros"
             ],
             swiftSettings: [
