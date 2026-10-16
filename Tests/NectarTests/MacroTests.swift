@@ -857,16 +857,16 @@ struct MacroTests {
             """
         }
     }
-    
+
     @Test func `reports no return value`() async throws {
         assertMacro {
             """
             @Endpoints
             struct BasicEndpoints: EndpointGroup {
                 let partialName = "basic"
-            
+
                 var subgroups: [Endpoint] { }
-            
+
                 @GET
                 func get() { "" }
             }
@@ -886,16 +886,16 @@ struct MacroTests {
             """
         }
     }
-    
+
     @Test func `reports Void return value`() async throws {
         assertMacro {
             """
             @Endpoints
             struct BasicEndpoints: EndpointGroup {
                 let partialName = "basic"
-            
+
                 var subgroups: [Endpoint] { }
-            
+
                 @GET
                 func get() -> Void { "" }
             }
@@ -916,16 +916,16 @@ struct MacroTests {
             """
         }
     }
-    
+
     @Test func `reports Swift.Void return value`() async throws {
         assertMacro {
             """
             @Endpoints
             struct BasicEndpoints: EndpointGroup {
                 let partialName = "basic"
-            
+
                 var subgroups: [Endpoint] { }
-            
+
                 @GET
                 func get() -> Void { "" }
             }
@@ -946,16 +946,16 @@ struct MacroTests {
             """
         }
     }
-    
+
     @Test func `reports () return value`() async throws {
         assertMacro {
             """
             @Endpoints
             struct BasicEndpoints: EndpointGroup {
                 let partialName = "basic"
-            
+
                 var subgroups: [Endpoint] { }
-            
+
                 @GET
                 func get() -> Void { "" }
             }

@@ -132,30 +132,30 @@ private let reader = ConfigReader(providers: [
             #expect(response.status == .ok)
             #expect(body == "PATCH price for product \(uuid.uuidString): \(updatePrice.newPrice)")
         }
-        
+
         try await app.test(.router) { client in
             let response = try await client.execute(
                 uri: "/secret",
                 method: .get
             )
-            
+
             #expect(response.status == .unauthorized)
-            
+
             var headers = HTTPFields()
             headers[.authorization] = "Bearer 123"
-            
+
             let authorized = try await client.execute(
                 uri: "/secret",
                 method: .get,
                 headers: headers
             )
-            
+
             #expect(authorized.status == .ok)
             let body = String(buffer: authorized.body)
             #expect(body == "Jokes on you, there is no secret")
         }
     }
-    
+
     @Test func `missing path parameter throws on registration`() {
         do {
             _ = try buildApplication(app: MissingApp())
@@ -257,12 +257,12 @@ fileprivate struct ProductEndpointGroup: EndpointGroup {
 @Endpoints
 fileprivate struct MiddlewareTest: EndpointGroup {
     let partialName: String = ""
-    
+
     @GET(pattern: "/secret")
     func secret() -> String {
         "Jokes on you, there is no secret"
     }
-    
+
     func addMiddlewares<C: RequestContext>(to group: RouterGroup<C>) -> RouterGroup<C> {
         group.addMiddleware {
             Middleware()
@@ -273,7 +273,7 @@ fileprivate struct MiddlewareTest: EndpointGroup {
 @Endpoints
 fileprivate struct MissingPathParam: EndpointGroup {
     let partialName: String = "missing"
-    
+
     @GET(pattern: "")
     func get(required: Bool) -> String {
         ""
@@ -299,7 +299,7 @@ struct Middleware<C: RequestContext>: RouterMiddleware {
         }
         return try await next(input, context)
     }
-    
+
     typealias Input = Request
     typealias Output = Response
     typealias Context = C

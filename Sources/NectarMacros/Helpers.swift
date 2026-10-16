@@ -53,18 +53,18 @@ extension StructDeclSyntax {
 
             method.reportIllegalParameters(for: arguments, using: context)
             method.warnUnusedParameters(for: arguments, using: context)
-                
+
             let pathParameters = arguments.filter { (name, type) in
                 name != "body" && type.typeAllowsPathParameter
             }
-            
+
             let pathParametersString = pathParameters.map { ":\($0.0)" }
 
             let partialPath = method.pattern
                 ?? pathParametersString.joined(separator: "/")
 
             let name = function.name.text
-            
+
             let pathParametersArray = pathParameters.map { "\"\($0.0)\"" }.joined(separator: ", ")
 
             endpoints.append(
