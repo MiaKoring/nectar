@@ -159,10 +159,11 @@ private let reader = ConfigReader(providers: [
     @Test func `missing path parameter throws on registration`() {
         do {
             _ = try buildApplication(app: MissingApp())
+            Issue.record("Expected EndpointAdditionError.missingPathParameter")
         } catch let error as EndpointAdditionError {
             if case .missingPathParameter(let param, let uri) = error {
                 #expect(param == "required")
-                #expect(uri == "/missing/:required")
+                #expect(uri == "/missing")
                 return
             }
             Issue.record(error)
@@ -273,7 +274,7 @@ fileprivate struct MiddlewareTest: EndpointGroup {
 fileprivate struct MissingPathParam: EndpointGroup {
     let partialName: String = "missing"
     
-    @GET
+    @GET(pattern: "")
     func get(required: Bool) -> String {
         ""
     }

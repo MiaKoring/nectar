@@ -911,7 +911,67 @@ struct MacroTests {
                 @GET
                 func get() -> Void { "" }
                            ┬──────
-                           ╰─ 🛑 Function needs a return a non-void value.
+                           ╰─ 🛑 Function needs to return a non-void value.
+            }
+            """
+        }
+    }
+    
+    @Test func `reports Swift.Void return value`() async throws {
+        assertMacro {
+            """
+            @Endpoints
+            struct BasicEndpoints: EndpointGroup {
+                let partialName = "basic"
+            
+                var subgroups: [Endpoint] { }
+            
+                @GET
+                func get() -> Void { "" }
+            }
+            """
+        } diagnostics: {
+            """
+            @Endpoints
+            struct BasicEndpoints: EndpointGroup {
+                let partialName = "basic"
+
+                var subgroups: [Endpoint] { }
+
+                @GET
+                func get() -> Void { "" }
+                           ┬──────
+                           ╰─ 🛑 Function needs to return a non-void value.
+            }
+            """
+        }
+    }
+    
+    @Test func `reports () return value`() async throws {
+        assertMacro {
+            """
+            @Endpoints
+            struct BasicEndpoints: EndpointGroup {
+                let partialName = "basic"
+            
+                var subgroups: [Endpoint] { }
+            
+                @GET
+                func get() -> Void { "" }
+            }
+            """
+        } diagnostics: {
+            """
+            @Endpoints
+            struct BasicEndpoints: EndpointGroup {
+                let partialName = "basic"
+
+                var subgroups: [Endpoint] { }
+
+                @GET
+                func get() -> Void { "" }
+                           ┬──────
+                           ╰─ 🛑 Function needs to return a non-void value.
             }
             """
         }

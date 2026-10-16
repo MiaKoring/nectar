@@ -36,11 +36,12 @@ extension StructDeclSyntax {
                 ))
                 continue
             }
-            guard returnClause.type.trimmedDescription != "Void" else {
+            let returnType = returnClause.type.trimmedDescription
+            guard returnType != "Void", returnType != "()", returnType != "Swift.Void" else {
                 context.diagnose(Diagnostic(
                     node: returnClause,
                     message: Message(
-                        message: "Function needs a return a non-void value.",
+                        message: "Function needs to return a non-void value.",
                         id: "function-needs-non-void-return-value",
                         severity: .error
                     )

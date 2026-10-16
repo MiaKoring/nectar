@@ -28,7 +28,7 @@ extension EndpointGroup {
     }
     
     public func build<C: RequestContext>(into group: RouterGroup<C>, currentURI: String) throws(EndpointAdditionError) {
-        let currentURI = currentURI + "/" + partialName
+        let currentURI = currentURI + (partialName.isEmpty ? "": "/" + partialName)
         var group = group.group("\(partialName)")
         
         group = addMiddlewares(to: group)
@@ -39,7 +39,7 @@ extension EndpointGroup {
         
         for endpoint in _endpoints {
             if !endpoint.pathParams.isEmpty {
-                let currentURI = currentURI + "/" + endpoint.partialPath
+                let currentURI = currentURI + (endpoint.partialPath.isEmpty ? "": "/" + endpoint.partialPath)
                 let splitURI = currentURI.split(separator: "/")
                 
                 for param in endpoint.pathParams {
