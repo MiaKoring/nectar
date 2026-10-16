@@ -10,5 +10,5 @@
 
 public protocol NectarApp {
     @EndpointBuilder
-    var endpoints: [Endpoint] { get }
+    var endpoints: [any EndpointGroup] { get }
 }

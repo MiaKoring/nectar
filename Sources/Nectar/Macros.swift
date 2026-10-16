@@ -7,6 +7,7 @@
 // Licensed under Apache License v2.0
 //
 // ===----------------------------------------------------------------------===
+import Hummingbird
 
 @attached(body)
 public macro GET(pattern: String? = nil) = #externalMacro(module: "NectarMacros", type: "GetMacro")
