@@ -23,6 +23,31 @@ extension StructDeclSyntax {
 
         for function in functions {
             guard let method = function.httpMethod else { continue }
+            guard
+                let returnClause = function.signature.returnClause
+            else {
+                context.diagnose(Diagnostic(
+                    node: function,
+                    message: Message(
+                        message: "Function needs a return value.",
+                        id: "function-needs-return-value",
+                        severity: .error
+                    )
+                ))
+                continue
+            }
+            let returnType = returnClause.type.trimmedDescription
+            guard returnType != "Void", returnType != "()", returnType != "Swift.Void" else {
+                context.diagnose(Diagnostic(
+                    node: returnClause,
+                    message: Message(
+                        message: "Function needs to return a non-void value.",
+                        id: "function-needs-non-void-return-value",
+                        severity: .error
+                    )
+                ))
+                continue
+            }
 
             let arguments = function.arguments
 
@@ -31,19 +56,24 @@ extension StructDeclSyntax {
 
             let pathParameters = arguments.filter { (name, type) in
                 name != "body" && type.typeAllowsPathParameter
-            }.map { ":\($0.0)" }
+            }
+
+            let pathParametersString = pathParameters.map { ":\($0.0)" }
 
             let partialPath = method.pattern
-                ?? pathParameters.joined(separator: "/")
+                ?? pathParametersString.joined(separator: "/")
 
             let name = function.name.text
+
+            let pathParametersArray = pathParameters.map { "\"\($0.0)\"" }.joined(separator: ", ")
 
             endpoints.append(
                 """
                 Endpoint(
                     partialPath: \(literal: partialPath),
                     httpMethod: .\(raw: method.method),
-                    handler: { request, context in 
+                    pathParams: [\(raw: pathParametersArray)],
+                    handler: { request, context in
                         try await _\(raw: name)(request, context) 
                     }
                 )

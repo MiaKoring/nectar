@@ -67,6 +67,7 @@ struct MacroTests {
                         Endpoint(
                             partialPath: "",
                             httpMethod: .get,
+                            pathParams: [],
                             handler: { request, context in
                                 try await _get(request, context)
                             }
@@ -74,6 +75,7 @@ struct MacroTests {
                         Endpoint(
                             partialPath: "",
                             httpMethod: .post,
+                            pathParams: [],
                             handler: { request, context in
                                 try await _post(request, context)
                             }
@@ -81,6 +83,7 @@ struct MacroTests {
                         Endpoint(
                             partialPath: "",
                             httpMethod: .patch,
+                            pathParams: [],
                             handler: { request, context in
                                 try await _patch(request, context)
                             }
@@ -88,6 +91,7 @@ struct MacroTests {
                         Endpoint(
                             partialPath: "",
                             httpMethod: .delete,
+                            pathParams: [],
                             handler: { request, context in
                                 try await _delete(request, context)
                             }
@@ -184,6 +188,7 @@ struct MacroTests {
                         Endpoint(
                             partialPath: "",
                             httpMethod: .get,
+                            pathParams: [],
                             handler: { request, context in
                                 try await _get(request, context)
                             }
@@ -191,6 +196,7 @@ struct MacroTests {
                         Endpoint(
                             partialPath: "",
                             httpMethod: .post,
+                            pathParams: [],
                             handler: { request, context in
                                 try await _post(request, context)
                             }
@@ -198,6 +204,7 @@ struct MacroTests {
                         Endpoint(
                             partialPath: "",
                             httpMethod: .patch,
+                            pathParams: [],
                             handler: { request, context in
                                 try await _patch(request, context)
                             }
@@ -205,6 +212,7 @@ struct MacroTests {
                         Endpoint(
                             partialPath: "",
                             httpMethod: .delete,
+                            pathParams: [],
                             handler: { request, context in
                                 try await _delete(request, context)
                             }
@@ -333,6 +341,7 @@ struct MacroTests {
                         Endpoint(
                             partialPath: ":number",
                             httpMethod: .get,
+                            pathParams: ["number"],
                             handler: { request, context in
                                 try await _get(request, context)
                             }
@@ -340,6 +349,7 @@ struct MacroTests {
                         Endpoint(
                             partialPath: "",
                             httpMethod: .post,
+                            pathParams: [],
                             handler: { request, context in
                                 try await _post(request, context)
                             }
@@ -347,6 +357,7 @@ struct MacroTests {
                         Endpoint(
                             partialPath: "",
                             httpMethod: .patch,
+                            pathParams: [],
                             handler: { request, context in
                                 try await _patch(request, context)
                             }
@@ -354,6 +365,7 @@ struct MacroTests {
                         Endpoint(
                             partialPath: "",
                             httpMethod: .delete,
+                            pathParams: [],
                             handler: { request, context in
                                 try await _delete(request, context)
                             }
@@ -361,6 +373,7 @@ struct MacroTests {
                         Endpoint(
                             partialPath: "",
                             httpMethod: .delete,
+                            pathParams: [],
                             handler: { request, context in
                                 try await _deleteReq(request, context)
                             }
@@ -368,6 +381,7 @@ struct MacroTests {
                         Endpoint(
                             partialPath: "",
                             httpMethod: .delete,
+                            pathParams: [],
                             handler: { request, context in
                                 try await _deleteContext(request, context)
                             }
@@ -375,6 +389,7 @@ struct MacroTests {
                         Endpoint(
                             partialPath: ":number",
                             httpMethod: .delete,
+                            pathParams: ["number"],
                             handler: { request, context in
                                 try await _deleteEverything(request, context)
                             }
@@ -559,6 +574,7 @@ struct MacroTests {
                         Endpoint(
                             partialPath: ":number/activity",
                             httpMethod: .get,
+                            pathParams: ["number"],
                             handler: { request, context in
                                 try await _get(request, context)
                             }
@@ -566,6 +582,7 @@ struct MacroTests {
                         Endpoint(
                             partialPath: "integer1",
                             httpMethod: .post,
+                            pathParams: [],
                             handler: { request, context in
                                 try await _post(request, context)
                             }
@@ -573,6 +590,7 @@ struct MacroTests {
                         Endpoint(
                             partialPath: "integer2",
                             httpMethod: .patch,
+                            pathParams: [],
                             handler: { request, context in
                                 try await _patch(request, context)
                             }
@@ -580,6 +598,7 @@ struct MacroTests {
                         Endpoint(
                             partialPath: "body",
                             httpMethod: .delete,
+                            pathParams: [],
                             handler: { request, context in
                                 try await _delete(request, context)
                             }
@@ -587,6 +606,7 @@ struct MacroTests {
                         Endpoint(
                             partialPath: "request",
                             httpMethod: .delete,
+                            pathParams: [],
                             handler: { request, context in
                                 try await _deleteReq(request, context)
                             }
@@ -594,6 +614,7 @@ struct MacroTests {
                         Endpoint(
                             partialPath: "context",
                             httpMethod: .delete,
+                            pathParams: [],
                             handler: { request, context in
                                 try await _deleteContext(request, context)
                             }
@@ -601,6 +622,7 @@ struct MacroTests {
                         Endpoint(
                             partialPath: ":number/activity",
                             httpMethod: .delete,
+                            pathParams: ["number"],
                             handler: { request, context in
                                 try await _deleteEverything(request, context)
                             }
@@ -749,6 +771,7 @@ struct MacroTests {
                         Endpoint(
                             partialPath: ":number/activity",
                             httpMethod: .get,
+                            pathParams: [],
                             handler: { request, context in
                                 try await _get(request, context)
                             }
@@ -830,6 +853,125 @@ struct MacroTests {
                 ┬────────────────────────────────
                 ╰─ 🛑 Path parameter 'number' declared as optional on the function. Path parameters cannot be optional. Make it non-optional or use a wildcard instead to use it as query parameter.
                 func get(number: Int?) -> String { "" }
+            }
+            """
+        }
+    }
+
+    @Test func `reports no return value`() async throws {
+        assertMacro {
+            """
+            @Endpoints
+            struct BasicEndpoints: EndpointGroup {
+                let partialName = "basic"
+
+                var subgroups: [Endpoint] { }
+
+                @GET
+                func get() { "" }
+            }
+            """
+        } diagnostics: {
+            """
+            @Endpoints
+            struct BasicEndpoints: EndpointGroup {
+                let partialName = "basic"
+
+                var subgroups: [Endpoint] { }
+
+                @GET
+                ╰─ 🛑 Function needs a return value.
+                func get() { "" }
+            }
+            """
+        }
+    }
+
+    @Test func `reports Void return value`() async throws {
+        assertMacro {
+            """
+            @Endpoints
+            struct BasicEndpoints: EndpointGroup {
+                let partialName = "basic"
+
+                var subgroups: [Endpoint] { }
+
+                @GET
+                func get() -> Void { "" }
+            }
+            """
+        } diagnostics: {
+            """
+            @Endpoints
+            struct BasicEndpoints: EndpointGroup {
+                let partialName = "basic"
+
+                var subgroups: [Endpoint] { }
+
+                @GET
+                func get() -> Void { "" }
+                           ┬──────
+                           ╰─ 🛑 Function needs to return a non-void value.
+            }
+            """
+        }
+    }
+
+    @Test func `reports Swift.Void return value`() async throws {
+        assertMacro {
+            """
+            @Endpoints
+            struct BasicEndpoints: EndpointGroup {
+                let partialName = "basic"
+
+                var subgroups: [Endpoint] { }
+
+                @GET
+                func get() -> Void { "" }
+            }
+            """
+        } diagnostics: {
+            """
+            @Endpoints
+            struct BasicEndpoints: EndpointGroup {
+                let partialName = "basic"
+
+                var subgroups: [Endpoint] { }
+
+                @GET
+                func get() -> Void { "" }
+                           ┬──────
+                           ╰─ 🛑 Function needs to return a non-void value.
+            }
+            """
+        }
+    }
+
+    @Test func `reports () return value`() async throws {
+        assertMacro {
+            """
+            @Endpoints
+            struct BasicEndpoints: EndpointGroup {
+                let partialName = "basic"
+
+                var subgroups: [Endpoint] { }
+
+                @GET
+                func get() -> Void { "" }
+            }
+            """
+        } diagnostics: {
+            """
+            @Endpoints
+            struct BasicEndpoints: EndpointGroup {
+                let partialName = "basic"
+
+                var subgroups: [Endpoint] { }
+
+                @GET
+                func get() -> Void { "" }
+                           ┬──────
+                           ╰─ 🛑 Function needs to return a non-void value.
             }
             """
         }

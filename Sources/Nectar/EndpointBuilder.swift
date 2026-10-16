@@ -10,7 +10,7 @@
 
 @resultBuilder
 public struct EndpointBuilder {
-    public static func buildBlock(_ components: EndpointDeclaration...) -> [Endpoint] {
-        return components.reduce(into: [Endpoint]()) { $0 += $1.endpoints }
+    public static func buildBlock(_ components: EndpointGroup...) -> [EndpointGroup] {
+        return components.reduce(into: [EndpointGroup]()) { $0.append($1) }
     }
 }

@@ -10,16 +10,11 @@
 
 public struct PathExtension: EndpointGroup {
     public let partialName: String
-    public let _endpoints: [Endpoint]
+    public let _endpoints: [Endpoint] = []
+    public var subgroups: [any EndpointGroup]
 
-    public init(_ partialPath: String, @EndpointBuilder endpoints: () -> [Endpoint]) {
+    public init(_ partialPath: String, @EndpointBuilder endpoints: () -> [EndpointGroup]) {
         self.partialName = partialPath
-        self._endpoints = endpoints().map {
-            Endpoint(
-                partialPath: "/" + $0.partialPath,
-                httpMethod: $0.httpMethod,
-                handler: $0.handler
-            )
-        }
+        self.subgroups = endpoints()
     }
 }

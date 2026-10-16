@@ -8,6 +8,8 @@
 //
 // ===----------------------------------------------------------------------===
 
+import Hummingbird
+
 @attached(body)
 public macro GET(pattern: String? = nil) = #externalMacro(module: "NectarMacros", type: "GetMacro")
 @attached(body)

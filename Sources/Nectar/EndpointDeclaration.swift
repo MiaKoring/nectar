@@ -7,9 +7,3 @@
 // Licensed under Apache License v2.0
 //
 // ===----------------------------------------------------------------------===
-
-public protocol EndpointDeclaration {
-    var partialName: String { get }
-
-    var endpoints: [Endpoint] { get }
-}
