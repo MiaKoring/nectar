@@ -23,6 +23,30 @@ extension StructDeclSyntax {
 
         for function in functions {
             guard let method = function.httpMethod else { continue }
+            guard
+                let returnClause = function.signature.returnClause
+            else {
+                context.diagnose(Diagnostic(
+                    node: function,
+                    message: Message(
+                        message: "Function needs a return value.",
+                        id: "function-needs-return-value",
+                        severity: .error
+                    )
+                ))
+                continue
+            }
+            guard returnClause.type.trimmedDescription != "Void" else {
+                context.diagnose(Diagnostic(
+                    node: returnClause,
+                    message: Message(
+                        message: "Function needs a return a non-void value.",
+                        id: "function-needs-non-void-return-value",
+                        severity: .error
+                    )
+                ))
+                continue
+            }
 
             let arguments = function.arguments
 

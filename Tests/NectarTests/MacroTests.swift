@@ -857,4 +857,63 @@ struct MacroTests {
             """
         }
     }
+    
+    @Test func `reports no return value`() async throws {
+        assertMacro {
+            """
+            @Endpoints
+            struct BasicEndpoints: EndpointGroup {
+                let partialName = "basic"
+            
+                var subgroups: [Endpoint] { }
+            
+                @GET
+                func get() { "" }
+            }
+            """
+        } diagnostics: {
+            """
+            @Endpoints
+            struct BasicEndpoints: EndpointGroup {
+                let partialName = "basic"
+
+                var subgroups: [Endpoint] { }
+
+                @GET
+                ╰─ 🛑 Function needs a return value.
+                func get() { "" }
+            }
+            """
+        }
+    }
+    
+    @Test func `reports Void return value`() async throws {
+        assertMacro {
+            """
+            @Endpoints
+            struct BasicEndpoints: EndpointGroup {
+                let partialName = "basic"
+            
+                var subgroups: [Endpoint] { }
+            
+                @GET
+                func get() -> Void { "" }
+            }
+            """
+        } diagnostics: {
+            """
+            @Endpoints
+            struct BasicEndpoints: EndpointGroup {
+                let partialName = "basic"
+
+                var subgroups: [Endpoint] { }
+
+                @GET
+                func get() -> Void { "" }
+                           ┬──────
+                           ╰─ 🛑 Function needs a return a non-void value.
+            }
+            """
+        }
+    }
 }
