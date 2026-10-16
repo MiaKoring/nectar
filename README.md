@@ -47,10 +47,16 @@ struct CommentEndpointGroup: EndpointGroup {
     func getComments(id: UUID) -> String {
         "id: \(id.uuidString)"
     }
+    
+    func addMiddlewares<C: RequestContext>(to group: RouterGroup<C>) -> RouterGroup<C> {
+        group.addMiddleware {
+            LogRequestMiddleware(.info)
+        }
+    }
 }
 
 // register: 
-router.registerNectarApp(AppEntry())
+try router.registerNectarApp(AppEntry())
 ```
 
 ## Goal
@@ -69,5 +75,6 @@ Nectar combines **Swift Macros** and **Result Builders** to extract parameters a
   * **Optional parameters** are automatically resolved as **query parameters**.
   * Arguments typed as `Request` or `any RequestContext` will seamlessly receive the raw request or request context.
 * **Path Customization:** Override or explicitly specify structural sub-paths using the `pattern` argument inside the route macros (e.g., `@GET(pattern: ":id/activity")`).
+* On startup every endpoint is checked for using path parameters thar aren't declared.
 
 
